@@ -1,0 +1,32 @@
+name: Update Sitemap
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # كل يوم الساعة 12 ظهرًا UTC (3 عصرًا بتوقيت السعودية)
+  workflow_dispatch:  # لتشغيله يدويًا من GitHub إذا أردت
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Generate sitemap
+        run: python generate_sitemap.py
+
+      - name: Commit and push sitemap
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add sitemap.xml
+          git commit -m "🔄 Update sitemap" || echo "No changes to commit"
+          git push
